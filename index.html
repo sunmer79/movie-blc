@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>아동모</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+:root {
+  --dot-color: #cbd5e1; 
+  --bg: #f0f4f2; 
+  --card-bg: #ffffff;
+  --text-main: #1e293b;
+  --text-sub: #64748b;
+  --border: #e2e8f0;
+  --present: #92dcc2; 
+  --absent: #cbd5e1;  
+  --reason-pink: #f472b6; 
+  --host-color: #475569;
+}
+body {
+  margin: 0; font-family: 'Pretendard', sans-serif;
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--dot-color) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+  color: var(--text-main);
+  padding: 40px 20px; display: flex; flex-direction: column; align-items: center;
+  word-break: keep-all;
+}
+h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 10px; cursor: pointer; transition: transform 0.2s; }
+#rulesBox {
+  display: none; background: #fffef0; border-left: 5px solid #fbbf24;
+  padding: 20px; border-radius: 12px; width: 100%; max-width: 480px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 25px; 
+  font-size: 0.85rem; line-height: 1.8; color: #454d5a; border: 1px solid #fef3c7;
+}
+.card {
+  background: var(--card-bg); border-radius: 20px; padding: 24px;
+  margin-bottom: 20px; border: 1px solid var(--border);
+  width: 100%; max-width: 480px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.card h3 { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-sub); display: flex; align-items: center; gap: 8px; }
+.card h3::before { content: ''; width: 4px; height: 14px; background: var(--present); border-radius: 10px; }
+.btn-gray {
+  background: #f8fafc; border: 1px solid var(--border);
+  padding: 6px 12px; border-radius: 8px; font-weight: 600;
+  color: #64748b; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; gap: 4px;
+}
+#movieView { margin-top: 10px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.poster-link img { width: 150px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: 0.2s; }
+.poster-link img:hover { transform: translateY(-3px); }
+#movieTitleBox strong { font-weight: 800; color: #000; font-size: 1.1rem; }
+#hostView { font-size: 1.2rem; font-weight: 700; color: var(--host-color); padding-left: 12px; }
+.row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f8fafc; }
+.member-info-wrapper { display: flex; align-items: center; gap: 12px; }
+.profile-img { width: 40px; height: 40px; border-radius: 50%; background: #f1f5f9; object-fit: cover; cursor: pointer; border: 1px solid var(--border); }
+.member-name { font-weight: 600; font-size: 1rem; }
+.member-reason { font-size: 0.8rem; color: var(--reason-pink); margin-top: 2px; font-weight: 600; }
+.toggle-switch { position: relative; width: 44px; height: 24px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--absent); transition: .3s; border-radius: 30px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--present); }
+input:checked + .slider:before { transform: translateX(20px); }
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.25); backdrop-filter: blur(3px); }
+.modal-content { 
+  background: white; margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  padding: 24px; border-radius: 20px; width: 85%; max-width: 340px; 
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+  animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes modalPop { from { opacity: 0; transform: translate(-50%, -45%) scale(0.95); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+.reason-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+.reason-desc { font-size: 0.75rem; color: var(--text-sub); margin-bottom: 15px; }
+.reason-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; outline: none; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; font-size: 0.9rem; }
+.reason-btns { display: flex; gap: 8px; }
+.reason-btns button { flex: 1; padding: 11px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+.btn-confirm { background: var(--present); color: #1e293b; }
+.btn-cancel { background: #f1f5f9; color: var(--text-sub); }
+</style>
+</head>
+<body>
+<h1 onclick="toggleRules()">📚아기이동진모임🎬</h1>
+<div id="rulesBox">
+  ✔️ 매주 토요일 11시 30분 진행<br>
+  ✔️ 퍼니 - 썸머 - 재빵 - 바다 - 결곰땅 - 희야 - 쏜 - 미사 - 테냥 - 누룽 - 끔 - 요이 순<br>
+  ✔️ 유동적으로 운영 (불참 시 해당 주, 달에 카톡에 얘기해 주면 됩니다 그래도 최대한 참여하기!!)<br>
+  <span style="font-size:0.8rem; color:#64748b;">
+    * 영화 장르 깊이 시청 여부 등 신경 쓰지 않고 호스트 마음대로 최대한 자유롭게 선택
+  </span><br><br>
+  <strong>*호스트가 본인 영화 노션 정리하기! (형식 자유)</strong><br>
+  <a href="https://www.notion.so/eeseosera/movie-club-dcc3290794614c1b9b89109d33500a98?source=copy_link" target="_blank" style="color:#0369a1; text-decoration:none; font-weight: 700;"> 🔗 노션 링크 바로가기</a>
+</div>
+<div class="card">
+  <div class="card-header">
+    <h3>오늘의 영화</h3>
+    <button class="btn-gray" id="openMovieBtn">🔍 영화 변경</button>
+  </div>
+  <div id="movieView"></div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <h3>이번 모임 호스트</h3>
+    <button class="btn-gray" id="openHostBtn">호스트 변경</button>
+  </div>
+  <div class="host-container">
+    <div id="hostView">로딩중...</div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header"><h3>출석 현황</h3></div>
+  <div id="list"></div>
+</div>
+<div id="movieModal" class="modal"><div class="modal-content"><div style="display:flex; justify-content:space-between; margin-bottom:16px;"><h2 style="margin:0; font-size:1.1rem; font-weight:700;">영화 검색</h2><span style="cursor:pointer; font-size:1.5rem;" onclick="closeAllModals()">&times;</span></div><div style="display:flex; gap:8px;"><input id="movieInput" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px; outline:none;" placeholder="영화 제목 입력" onkeydown="if(event.key === 'Enter') searchMovie()"><button onclick="searchMovie()" style="background:#334155; color:white; border:none; border-radius:8px; padding:0 12px; cursor:pointer;">검색</button></div><div id="movieResults" style="margin-top:16px; max-height:250px; overflow-y:auto;"></div></div></div>
+<div id="hostModal" class="modal"><div class="modal-content"><div style="display:flex; justify-content:space-between; margin-bottom:16px;"><h2 style="margin:0; font-size:1.1rem; font-weight:700;">호스트 선택</h2><span style="cursor:pointer; font-size:1.5rem;" onclick="closeAllModals()">&times;</span></div><div id="hostGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;"></div></div></div>
+<div id="reasonModal" class="modal">
+  <div class="modal-content">
+    <div class="reason-title">불참 사유를 적어주세요</div>
+    <div class="reason-desc">(모두에게 공개됩니다!)</div>
+    <input id="reasonInput" class="reason-input" placeholder="사유를 입력해 주세요">
+    <div class="reason-btns">
+      <button class="btn-cancel" onclick="cancelReason()">취소</button>
+      <button class="btn-confirm" onclick="submitReason()">확인</button>
+    </div>
+  </div>
+</div>
+<script>
+const { createClient } = supabase;
+const _supabase = createClient(
+  "https://jwiuqncbuphimwurofmp.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3aXVxbmNidXBoaW13dXJvZm1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNzAzMTgsImV4cCI6MjA4OTY0NjMxOH0.ded__ToJgPI2z5UPNozt26if5l3cs5sEHHl7_vqSqMA"
+);
+const TMDB_KEY = "8ebda71432587b66d5bcd02f7777d17a";
+const ATTENDANCE_ORDER = ["퍼니", "썸머", "재빵", "바다", "결곰땅", "희야", "쏜", "미사", "테냥", "누룽", "끔", "요이"];
+let targetMemberId = null;
+function toggleRules() {
+  const box = document.getElementById('rulesBox');
+  box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+}
+function closeAllModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+document.getElementById('openMovieBtn').onclick = () => {
+    document.getElementById('movieModal').style.display = 'block';
+    setTimeout(() => document.getElementById('movieInput').focus(), 100);
+};
+document.getElementById('openHostBtn').onclick = () => document.getElementById('hostModal').style.display = 'block';
+function getRecentSunday() {
+  const d = new Date();
+  const day = d.getDay();
+  const diff = d.getDate() - day;
+  const sunday = new Date(d.setDate(diff));
+  return sunday.toISOString().split('T')[0];
+}
+async function searchMovie() {
+  const query = document.getElementById("movieInput").value;
+  if(!query) return;
+  const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${query}&language=ko-KR`);
+  const data = await res.json();
+  const list = document.getElementById("movieResults");
+  list.innerHTML = "";
+  data.results.forEach(m => {
+    const item = document.createElement("div");
+    item.style = "display:flex; gap:10px; padding:10px; cursor:pointer; border-bottom:1px solid #f9f9f9; align-items:center;";
+    item.innerHTML = `<img src="https://image.tmdb.org/t/p/w200${m.poster_path}" style="width:40px; border-radius:4px;"> <div style="font-weight:600; font-size:0.85rem;">${m.title}</div>`;
+    item.onclick = async () => {
+      await _supabase.from("meta").update({ movie_title: m.title, movie_poster: 'https://image.tmdb.org/t/p/w500'+m.poster_path }).eq("id", 1);
+      closeAllModals(); load();
+    };
+    list.appendChild(item);
+  });
+}
+async function uploadProfile(e, memberId) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const fileName = `${memberId}-${Date.now()}.png`;
+  const { error } = await _supabase.storage.from('avatars').upload(`profiles/${fileName}`, file);
+  if (error) return alert("업로드 실패!");
+  const { data: { publicUrl } } = _supabase.storage.from('avatars').getPublicUrl(`profiles/${fileName}`);
+  await _supabase.from("attendance").update({ profile_url: publicUrl }).eq("id", memberId);
+  load();
+}
+async function handleToggle(id, isPresent) {
+  if (!isPresent) {
+    targetMemberId = id;
+    document.getElementById('reasonInput').value = "";
+    document.getElementById('reasonModal').style.display = 'block';
+    setTimeout(() => document.getElementById('reasonInput').focus(), 100);
+  } else {
+    await _supabase.from("attendance").update({ present: true, reason: "" }).eq("id", id);
+    load();
+  }
+}
+async function submitReason() {
+  const reason = document.getElementById('reasonInput').value || "사유 미입력";
+  await _supabase.from("attendance").update({ present: false, reason: reason }).eq("id", targetMemberId);
+  closeAllModals(); load();
+}
+function cancelReason() { closeAllModals(); load(); }
+async function updateHost(name) {
+  await _supabase.from("meta").update({ override_host: name }).eq("id", 1);
+  closeAllModals(); load();
+}
+async function load() {
+  const { data: meta } = await _supabase.from("meta").select("*").eq("id", 1).single();
+  const recentSunday = getRecentSunday();
+  if (meta.last_reset !== recentSunday) {
+    let nextIndex = (meta.host_index + 1) % ATTENDANCE_ORDER.length;
+    await _supabase.from("meta").update({ last_reset: recentSunday, host_index: nextIndex, override_host: null }).eq("id", 1);
+    await _supabase.from("attendance").update({ present: true, reason: "" }).neq("id", "dummy");
+    location.reload();
+    return;
+  }
+  const { data: members } = await _supabase.from("attendance").select("*");
+  document.getElementById("hostView").innerText = meta.override_host || ATTENDANCE_ORDER[meta.host_index] || "미정";
+  const grid = document.getElementById("hostGrid");
+  grid.innerHTML = "";
+  ATTENDANCE_ORDER.forEach(name => {
+    const btn = document.createElement("button");
+    btn.style = "padding:10px; border:1px solid var(--border); border-radius:8px; background:white; cursor:pointer; font-weight:600; font-size:0.8rem; font-family:inherit;";
+    btn.innerText = name; btn.onclick = () => updateHost(name);
+    grid.appendChild(btn);
+  });
+  if (meta.movie_title) {
+    const searchUrl = `https://www.google.com/search?q=영화+${encodeURIComponent(meta.movie_title)}`;
+    document.getElementById("movieView").innerHTML = `
+      <a href="${searchUrl}" target="_blank" class="poster-link">
+        <img src="${meta.movie_poster}">
+      </a>
+      <div id="movieTitleBox">오늘의 영화는 [ <strong>${meta.movie_title}</strong> ]</div>
+    `;
+  }
+  const sortedMembers = members.sort((a, b) => {
+    const nameA = a.name.replace(/\n/g, "").trim();
+    const nameB = b.name.replace(/\n/g, "").trim();
+    return ATTENDANCE_ORDER.indexOf(nameA) - ATTENDANCE_ORDER.indexOf(nameB);
+  });
+  const listEl = document.getElementById("list");
+  listEl.innerHTML = "";
+  sortedMembers.forEach(m => {
+    const isPresent = m.present !== false; 
+    const cleanName = m.name.replace(/\n/g, "").trim();
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `
+      <div class="member-info-wrapper">
+        <input type="file" id="file-${m.id}" style="display:none" accept="image/*" onchange="uploadProfile(event, '${m.id}')">
+        <img src="${m.profile_url || 'https://www.gravatar.com/avatar/?d=mp'}" class="profile-img" onclick="document.getElementById('file-${m.id}').click()">
+        <div class="member-info">
+          <span class="member-name" style="${!isPresent ? 'color:#9ca3af' : ''}">${cleanName}</span>
+          ${(!isPresent && m.reason) ? `<span class="member-reason">${m.reason}</span>` : ''}
+        </div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" ${isPresent ? "checked" : ""} onchange="handleToggle('${m.id}', this.checked)">
+        <span class="slider"></span>
+      </label>
+    `;
+    listEl.appendChild(row);
+  });
+}
+load();
+</script>
+</body>
+</html>
