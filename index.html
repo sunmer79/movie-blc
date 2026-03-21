@@ -14,7 +14,7 @@
   --text-main: #1e293b;
   --text-sub: #64748b;
   --border: #e2e8f0;
-  --present: #92dcc2; 
+  --present: #3bc28a; 
   --absent: #cbd5e1;  
   --reason-pink: #f472b6; 
   --host-color: #475569;
@@ -77,8 +77,9 @@ input:checked + .slider:before { transform: translateX(20px); }
 .reason-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; outline: none; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; font-size: 0.9rem; }
 .reason-btns { display: flex; gap: 8px; }
 .reason-btns button { flex: 1; padding: 11px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
-.btn-confirm { background: var(--present); color: #1e293b; }
+.btn-confirm { background: var(--present); color: #fff; }
 .btn-cancel { background: #f1f5f9; color: var(--text-sub); }
+#attendCount { font-size: 0.85rem; color: var(--present); margin-left: 4px; font-weight: 800; }
 </style>
 </head>
 <body>
@@ -110,7 +111,9 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 </div>
 <div class="card">
-  <div class="card-header"><h3>출석 현황</h3></div>
+  <div class="card-header">
+    <h3>참여 현황 <span id="attendCount"></span></h3>
+  </div>
   <div id="list"></div>
 </div>
 <div id="movieModal" class="modal"><div class="modal-content"><div style="display:flex; justify-content:space-between; margin-bottom:16px;"><h2 style="margin:0; font-size:1.1rem; font-weight:700;">영화 검색</h2><span style="cursor:pointer; font-size:1.5rem;" onclick="closeAllModals()">&times;</span></div><div style="display:flex; gap:8px;"><input id="movieInput" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px; outline:none;" placeholder="영화 제목 입력" onkeydown="if(event.key === 'Enter') searchMovie()"><button onclick="searchMovie()" style="background:#334155; color:white; border:none; border-radius:8px; padding:0 12px; cursor:pointer;">검색</button></div><div id="movieResults" style="margin-top:16px; max-height:250px; overflow-y:auto;"></div></div></div>
@@ -230,6 +233,8 @@ async function load() {
       <div id="movieTitleBox">오늘의 영화는 [ <strong>${meta.movie_title}</strong> ]</div>
     `;
   }
+  const presentCount = members.filter(m => m.present !== false).length;
+  document.getElementById("attendCount").innerText = `(${presentCount}/${members.length})`;
   const sortedMembers = members.sort((a, b) => {
     const nameA = a.name.replace(/\n/g, "").trim();
     const nameB = b.name.replace(/\n/g, "").trim();
