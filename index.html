@@ -22,23 +22,26 @@
 body {
   margin: 0; font-family: 'Pretendard', sans-serif;
   background-color: var(--bg);
-  background-image: radial-gradient(var(--dot-color) 1.2px, transparent 1.2px);
-  background-size: 24px 24px;
+  background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
   color: var(--text-main);
-  padding: 40px 20px; display: flex; flex-direction: column; align-items: center;
+  padding: 40px 15px; display: flex; flex-direction: column; align-items: center;
   word-break: keep-all;
 }
-h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 10px; cursor: pointer; transition: transform 0.2s; }
+h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s; }
 #rulesBox {
   display: none; background: #fffef0; border-left: 5px solid #fbbf24;
-  padding: 20px; border-radius: 12px; width: 100%; max-width: 480px;
+  padding: 20px; border-radius: 12px; width: 92%; max-width: 400px;
   box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 25px; 
-  font-size: 0.85rem; line-height: 1.8; color: #454d5a; border: 1px solid #fef3c7;
+  font-size: 0.85rem; line-height: 1.8; color: #454d5a; border: 1px solid #fef3c7; box-sizing: border-box;
 }
 .card {
   background: var(--card-bg); border-radius: 20px; padding: 24px;
   margin-bottom: 20px; border: 1px solid var(--border);
-  width: 100%; max-width: 480px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  width: 92%; max-width: 400px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); box-sizing: border-box;
+}
+@media (min-width: 600px) {
+  #rulesBox, .card { max-width: 480px; }
 }
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .card h3 { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-sub); display: flex; align-items: center; gap: 8px; }
@@ -48,10 +51,10 @@ h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 10px; cursor: pointer; 
   padding: 6px 12px; border-radius: 8px; font-weight: 600;
   color: #64748b; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; gap: 4px;
 }
-#movieView { margin-top: 10px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.poster-link img { width: 150px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: 0.2s; }
-.poster-link img:hover { transform: translateY(-3px); }
-#movieTitleBox strong { font-weight: 800; color: #000; font-size: 1.1rem; }
+#movieView { margin-top: 5px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.poster-link img { width: 140px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: 0.2s; }
+#movieTitleBox { font-size: 1rem; }
+#movieTitleBox strong { font-weight: 800; color: #000; }
 #hostView { font-size: 1.2rem; font-weight: 700; color: var(--host-color); padding-left: 12px; }
 .row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f8fafc; }
 .member-info-wrapper { display: flex; align-items: center; gap: 12px; }
@@ -66,7 +69,7 @@ input:checked + .slider { background-color: var(--present); }
 input:checked + .slider:before { transform: translateX(20px); }
 .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.25); backdrop-filter: blur(3px); }
 .modal-content { 
-  background: white; margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
   padding: 24px; border-radius: 20px; width: 85%; max-width: 340px; 
   box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
   animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -76,10 +79,15 @@ input:checked + .slider:before { transform: translateX(20px); }
 .reason-desc { font-size: 0.75rem; color: var(--text-sub); margin-bottom: 15px; }
 .reason-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; outline: none; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; font-size: 0.9rem; }
 .reason-btns { display: flex; gap: 8px; }
-.reason-btns button { flex: 1; padding: 11px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+.reason-btns button { flex: 1; padding: 11px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
 .btn-confirm { background: var(--present); color: #fff; }
 .btn-cancel { background: #f1f5f9; color: var(--text-sub); }
 #attendCount { font-size: 0.85rem; color: var(--present); margin-left: 4px; font-weight: 800; }
+.host-select-btn {
+  padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: white; 
+  cursor: pointer; font-weight: 600; font-size: 0.8rem; font-family: inherit;
+  color: var(--text-main) !important; text-decoration: none !important; -webkit-appearance: none;
+}
 </style>
 </head>
 <body>
@@ -91,7 +99,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   <span style="font-size:0.8rem; color:#64748b;">
     * 영화 장르 깊이 시청 여부 등 신경 쓰지 않고 호스트 마음대로 최대한 자유롭게 선택
   </span><br><br>
-  <strong>*호스트가 본인 영화 노션 정리하기! (형식 자유)</strong><br>
+  <strong>*호스트가 본인 영화 노션 정리하기!</strong><br>
   <a href="https://www.notion.so/eeseosera/movie-club-dcc3290794614c1b9b89109d33500a98?source=copy_link" target="_blank" style="color:#0369a1; text-decoration:none; font-weight: 700;"> 🔗 노션 링크 바로가기</a>
 </div>
 <div class="card">
@@ -116,7 +124,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
   <div id="list"></div>
 </div>
-<div id="movieModal" class="modal"><div class="modal-content"><div style="display:flex; justify-content:space-between; margin-bottom:16px;"><h2 style="margin:0; font-size:1.1rem; font-weight:700;">영화 검색</h2><span style="cursor:pointer; font-size:1.5rem;" onclick="closeAllModals()">&times;</span></div><div style="display:flex; gap:8px;"><input id="movieInput" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px; outline:none;" placeholder="영화 제목 입력" onkeydown="if(event.key === 'Enter') searchMovie()"><button onclick="searchMovie()" style="background:#334155; color:white; border:none; border-radius:8px; padding:0 12px; cursor:pointer;">검색</button></div><div id="movieResults" style="margin-top:16px; max-height:250px; overflow-y:auto;"></div></div></div>
+<div id="movieModal" class="modal"><div class="modal-content"><div style="display:flex; justify-content:space-between; margin-bottom:16px;"><h2 style="margin:0; font-size:1.1rem; font-weight:700;">영화 검색</h2><span style="cursor:pointer; font-size:1.5rem;" onclick="closeAllModals()">&times;</span></div><div style="display:flex; gap:8px;"><input id="movieInput" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px; outline:none;" placeholder="영화 제목 입력" onkeydown="if(event.key === 'Enter') searchMovie()"><button onclick="searchMovie()" style="background:#334155; color:white; border:none; border-radius:8px; padding:0 12px; cursor:pointer; font-size:0.85rem;">검색</button></div><div id="movieResults" style="margin-top:16px; max-height:250px; overflow-y:auto;"></div></div></div>
 <div id="hostModal" class="modal"><div class="modal-content"><div style="display:flex; justify-content:space-between; margin-bottom:16px;"><h2 style="margin:0; font-size:1.1rem; font-weight:700;">호스트 선택</h2><span style="cursor:pointer; font-size:1.5rem;" onclick="closeAllModals()">&times;</span></div><div id="hostGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;"></div></div></div>
 <div id="reasonModal" class="modal">
   <div class="modal-content">
@@ -220,7 +228,7 @@ async function load() {
   grid.innerHTML = "";
   ATTENDANCE_ORDER.forEach(name => {
     const btn = document.createElement("button");
-    btn.style = "padding:10px; border:1px solid var(--border); border-radius:8px; background:white; cursor:pointer; font-weight:600; font-size:0.8rem; font-family:inherit;";
+    btn.className = "host-select-btn";
     btn.innerText = name; btn.onclick = () => updateHost(name);
     grid.appendChild(btn);
   });
